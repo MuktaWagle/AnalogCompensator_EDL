@@ -1,0 +1,108 @@
+    ** Compensator Circuit **
+*
+* Multisim Live SPICE netlist
+*
+*
+
+* --- Circuit Topology ---
+
+* Component: C1
+cC1 2 0 1e-8 
+
+* Component: C2
+cC2 1 0 1e-8 
+
+* Component: C3
+cC3 3 0 1e-8 
+
+* Component: R1
+rR1 8 4 68000 VIRTUAL_RESISTANCE_R1 
+
+* Component: R2
+rR2 4 2 10000 VIRTUAL_RESISTANCE_R2 
+
+* Component: R3
+rR3 7 9 220000 VIRTUAL_RESISTANCE_R3 
+
+* Component: R4
+rR4 7 0 16000 VIRTUAL_RESISTANCE_R4 
+
+* Component: R_1
+rR_1 4 5 68000 VIRTUAL_RESISTANCE_R_1 
+
+* Component: R_2
+rR_2 5 1 10000 VIRTUAL_RESISTANCE_R_2 
+
+* Component: R__1
+rR__1 5 6 68000 VIRTUAL_RESISTANCE_R__1 
+
+* Component: R__2
+rR__2 6 3 10000 VIRTUAL_RESISTANCE_R__2 
+
+* Component: U1
+xU1 6 7 9 3T_VIRTUAL_U1 PARAMS: VOS=0 IBS=0 IOS=0 AVOL=200000 BW=100000000 RI=10000000 RO=10 VOMP=12 VOMN=-12
+
+* Component: V1
+vV1 8 0 dc 0 ac 1 0 
+ + distof1 0 0 
+ + distof2 0 0 
+ + sin ( 0 1 1000 0 0 0 )
+
+
+* --- Circuit Models ---
+
+* R1 model
+.model VIRTUAL_RESISTANCE_R1 r(    )
+
+* R2 model
+.model VIRTUAL_RESISTANCE_R2 r(    )
+
+* R3 model
+.model VIRTUAL_RESISTANCE_R3 r(    )
+
+* R4 model
+.model VIRTUAL_RESISTANCE_R4 r(    )
+
+* R_1 model
+.model VIRTUAL_RESISTANCE_R_1 r(    )
+
+* R_2 model
+.model VIRTUAL_RESISTANCE_R_2 r(    )
+
+* R__1 model
+.model VIRTUAL_RESISTANCE_R__1 r(    )
+
+* R__2 model
+.model VIRTUAL_RESISTANCE_R__2 r(    )
+
+
+* --- Subcircuits ---
+
+* U1 subcircuit
+.SUBCKT 3T_VIRTUAL_U1 in_pos in_neg out PARAMS: AVOL=500k BW=10Meg RI=10Meg RO=0 VOS=0 IBS=0 IOS=0 VOMP=15 VOMN=-15 
+
+* Input Stage: Rin, Ibias, Voffset
+VOS in_pos 4 {VOS}
+Ibias1 4 0 {IBS}
+Ibias2 in_neg 0 {IBS}
+Ios 4 in_neg {IOS/2}
+Rin 4 in_neg {RI}
+
+*Middle stage: Gain, frequency, voltage limiting
+Bgain 0 6 I={v(4,in_neg)*AVOL/1meg }
+R1 6 0 1meg
+CP1 6 0 {AVOL/(2*pi*1meg*BW)}
+
+
+Vpos 9 0 {VOMP}
+Dlimit_pos 6 9 d1
+
+Vneg 10 0 {VOMN}
+Dlimit_neg 10 6 d1
+
+.model d1 d(n=0.1) 
+
+*Output stage: Buffer, output resistance 
+E2 7 0 6 0 1
+Rout 7 out {RO}
+.ends
